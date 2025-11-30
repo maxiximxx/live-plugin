@@ -1,0 +1,31 @@
+/* plugin/components/live-file/index.wxss */
+.wrapper {
+  height: 100%;
+}
+
+.file-list {
+  padding: 30rpx;
+}
+
+.file-item {
+  background-color: #f4f5f9;
+  padding: 24rpx;
+  border-radius: 16rpx;
+  margin-top: 24rpx;
+}
+
+.file-item:first-child {
+  margin-top: 0;
+}
+
+.file-name {
+  color: #212121;
+  font-size: 28rpx;
+  font-weight: 600;
+}
+
+.file-time {
+  margin-top: 8rpx;
+  color: #000000;
+  font-size: 24rpx;
+}

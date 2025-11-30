@@ -1,0 +1,11 @@
+{
+  "pages": [
+    "pages/index/index"
+  ],
+  "plugins": {
+    "live-plugin": {
+      "version": "dev",
+      "provider": "wx4de22cfc7708c420"
+    }
+  }
+}

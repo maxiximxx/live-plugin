@@ -1,0 +1,21 @@
+<!--plugin/components/live-tabs/index.wxml-->
+<view class="wrapper">
+	<!-- 导航栏 -->
+	<view class="tabs-nav">
+		<view wx:for="{{tabs}}" wx:key="index" class="nav-item {{activeIndex === index ? 'nav-item--active' : ''}}" bindtap="onTabClick" data-index="{{index}}">
+			{{item.title}}
+		</view>
+		<!-- 滑动指示条 -->
+		<view class="nav-slider" style="transform: translateX({{sliderOffset}}px);width: {{sliderWidth}}rpx;"></view>
+	</view>
+
+	<!-- 内容区 -->
+	<swiper class="tabs-content" current="{{activeIndex}}" bindchange="onSwiperChange">
+		<swiper-item wx:for="{{tabs}}" wx:key="index">
+			<view class="swiper-item-content">
+				<!-- 使用插槽，允许自定义每个tab的内容 -->
+				<slot name="tab-content-{{index}}"></slot>
+			</view>
+		</swiper-item>
+	</swiper>
+</view>

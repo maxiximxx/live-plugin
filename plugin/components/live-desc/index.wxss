@@ -1,0 +1,10 @@
+/* plugin/components/live-desc/index.wxss */
+.wrapper {
+	height: 100%;
+}
+
+.desc {
+  color: rgba(0, 0, 0, 0.6);
+	font-size: 28rpx;
+	padding: 30rpx 56rpx;
+}

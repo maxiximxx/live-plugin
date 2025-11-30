@@ -1,0 +1,4 @@
+<!--plugin/components/live-desc/index.wxml-->
+<scroll-view scroll-y class="wrapper">
+	<view class="desc">{{desc}}</view>
+</scroll-view>

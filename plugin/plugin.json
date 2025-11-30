@@ -1,0 +1,11 @@
+{
+	"publicComponents": {
+		"live-player-plugin": "components/live-player/index",
+		"live-desc-plugin": "components/live-desc/index",
+		"live-file-plugin": "components/live-file/index",
+		"live-chat-plugin": "components/live-chat/index",
+		"live-tabs-plugin": "components/live-tabs/index"
+	},
+	"pages": {},
+	"main": "index.js"
+}

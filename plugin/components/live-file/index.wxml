@@ -1,0 +1,9 @@
+<!--plugin/components/live-file/index.wxml-->
+<scroll-view scroll-y class="wrapper">
+	<view class="file-list">
+		<view class="file-item" wx:for="{{fileList}}" wx:key="index" data-index="{{index}}" bind:tap="onOpenFile">
+			<view class="file-name">{{item.fileName}}</view>
+			<view class="file-time">{{item.fileTime}}</view>
+		</view>
+	</view>
+</scroll-view>
