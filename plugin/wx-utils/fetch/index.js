@@ -1,8 +1,8 @@
 import { useFetch } from './fetch';
 import { getErrorMsg } from './tools';
-import eventBus from '/utils/event-bus';
-import { cloneDeep } from '/utils/index.js';
-import { hideLoading, loading, toast } from '/utils/native';
+import eventBus from '../event-bus';
+import { cloneDeep } from '../index.js';
+import { hideLoading, loading, toast } from '../native';
 
 const SUCCESS_STATUS_CODES = [200];
 

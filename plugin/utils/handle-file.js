@@ -34,8 +34,8 @@ export const downloadFile = (url, options = {}) => {
 
 /**
  * 打开文件
- * @param {string} filePath
- * @param {object} options
+ * @param {string} filePath 文件地址
+ * @param {object} options wx.openDocument配置
  */
 export const openFile = (filePath, options = {}) => {
   if (!filePath) {

@@ -1,4 +1,4 @@
-import { asyncDebounce, merge } from '/utils/index.js';
+import { asyncDebounce, merge } from '../index';
 
 const useInterceptorManager = () => {
   const handlers = [];
@@ -16,7 +16,7 @@ export const useFetch = (getRequestConfig) => {
   };
 
   const dispatchRequest = fullRequestConfig => new Promise((resolve) => {
-    const { host, url, method, header, timeout, data: requestData } = fullRequestConfig;
+		const { host, url, method, header, timeout, data: requestData } = fullRequestConfig;
     wx.request({
       url: `${host}${url}`,
       method,

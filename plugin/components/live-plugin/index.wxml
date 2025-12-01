@@ -1,0 +1,20 @@
+<!--plugin/components/live-plugin/index.wxml-->
+<view class="wrapper">
+	<view class="live-player">
+		<live-player-plugin src="{{liveSrc}}" mode="live" autoplay="{{true}}" bindstatechange="onStateChange" binderror="onPlayerError" />
+	</view>
+
+	<view class="live-tabs">
+		<live-tabs-plugin tabs="{{tabs}}" defaultIndex="{{0}}" bind:tabchange="onTabChange">
+			<view slot="tab-content-0" class="tab0">
+				<live-desc-plugin desc="{{liveDesc}}" />
+			</view>
+			<view slot="tab-content-1" class="tab0">
+				<live-file-plugin fileList="{{fileList}}" />
+			</view>
+			<view slot="tab-content-2" class="tab0">
+				<live-chat-plugin bindtokenexpired="onTokenExpired" />
+			</view>
+		</live-tabs-plugin>
+	</view>
+</view>

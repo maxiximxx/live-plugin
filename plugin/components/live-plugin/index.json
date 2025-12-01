@@ -1,0 +1,10 @@
+{
+	"component": true,
+	"usingComponents": {
+		"live-player-plugin": "../live-player/index",
+		"live-desc-plugin": "../live-desc/index",
+		"live-file-plugin": "../live-file/index",
+		"live-chat-plugin": "../live-chat/index",
+		"live-tabs-plugin": "../live-tabs/index"
+	}
+}

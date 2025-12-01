@@ -1,7 +1,7 @@
 /**
  * TOAST
- * @param {string} title
- * @param {object} options
+ * @param {string} title 文案
+ * @param {object} options wx.showToast配置
  */
 export const showToast = (title, options = {}) => {
   if (!title) {
@@ -17,7 +17,7 @@ export const showToast = (title, options = {}) => {
 
 /**
  * showLoading
- * @param {string} title
+ * @param {string} title 文案
  */
 export const showLoading = (title = '') => {
   wx.showLoading({

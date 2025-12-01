@@ -1,3 +1,5 @@
+import { getWindowInfo, rpxToPx } from '../../utils/common'
+
 // plugin/components/live-tabs/index.js
 Component({
   options: {
@@ -33,30 +35,18 @@ Component({
 
   lifetimes: {
     attached() {
-      this.getWindowInfo()
       this.updateSliderPosition(this.properties.defaultIndex)
     },
   },
 
   methods: {
-    // 获取窗口信息用于计算
-    getWindowInfo() {
-			const windowInfo = wx.getWindowInfo()
-			console.log(windowInfo)
-			this.windowWidth = windowInfo.windowWidth // 屏幕宽度
-    },
-
-    // rpx 转 px 的通用方法
-    rpxToPx(rpxValue) {
-      return (rpxValue / 750) * this.windowWidth
-    },
-
     // 更新指示条位置
     updateSliderPosition(activeIndex = this.data.activeIndex) {
-			const { tabs, sliderWidth } = this.properties
-      const itemWidth = this.windowWidth / tabs.length
+      const { windowWidth } = getWindowInfo()
+      const { tabs, sliderWidth } = this.properties
+      const itemWidth = windowWidth / tabs.length
       // 将 sliderWidth 从 rpx 转换为 px
-			const sliderWidthPx = this.rpxToPx(sliderWidth)
+      const sliderWidthPx = rpxToPx(sliderWidth)
       const newOffset =
         activeIndex * itemWidth + (itemWidth - sliderWidthPx) / 2
       this.setData({

@@ -7,8 +7,8 @@ const { ImEngine, ImLogLevel } = alivc
 // IM SDK 初始化配置
 const imConfig = {
   deviceId: '1', // 选填
-  appId: '9282fa9848b2', // 必须：从阿里云控制台获取
-  appSign: '977e4c9a3e93e22bfb68c58bdfcb7646', // 必须：从阿里云控制台获取
+  appId: '2', // 必须：从阿里云控制台获取
+  appSign:'3', // 必须：从阿里云控制台获取
   logLevel: ImLogLevel.ERROR, // 日志输出等级
   wasmPath: '/lib/alivc-im.wasm.br', // wasm文件路径
 }
@@ -58,7 +58,7 @@ Component({
   lifetimes: {
     created: function () {
       wx.onAppShow = () => {}
-			wx.onAppHide = () => {}
+      wx.onAppHide = () => {}
     },
     attached: function () {
       this.initializeIM()
@@ -124,6 +124,11 @@ Component({
 
     // 设置imEngine监听
     setupImEngineListeners: function () {
+			// 连接中
+			this.imEngine.on("connecting", () => {
+				console.log("connecting");
+			});
+
       // 连接成功事件
       this.imEngine.on('connectsuccess', () => {
         console.log('IM连接成功')
@@ -151,10 +156,7 @@ Component({
         this.handleTokenExpired(callback)
       })
       console.log('imEngine监听设置完成')
-    },
 
-    // 设置groupManager监听
-    setupGroupManagerListenrs: function () {
       // 有人进入或离开群组
       this.groupManager.on('memberdatachange', (data) => {
         const {
@@ -174,10 +176,7 @@ Component({
         )
       })
       console.log('groupManager监听设置完成')
-    },
 
-    // 设置groupManager监听
-    setupMessageManagerListenrs: function () {
       // 收到群聊消息
       this.messageManager.on('recvgroupmessage', (msg, groupId) => {
         console.log('收到群聊消息', msg, groupId)
@@ -243,8 +242,6 @@ Component({
 
         console.log('IM登录成功')
         this.setData({ isLoggedIn: true })
-        // 设置事件监听器
-        this.setupGroupManagerListenrs()
         // 自动进入群组
         this.enterGroup()
       } catch (error) {

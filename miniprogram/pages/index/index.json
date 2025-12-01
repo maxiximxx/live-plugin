@@ -1,9 +1,5 @@
 {
   "usingComponents": {
-    "live-player-plugin": "plugin://live-plugin/live-player-plugin",
-		"live-desc-plugin": "plugin://live-plugin/live-desc-plugin",
-		"live-file-plugin": "plugin://live-plugin/live-file-plugin",
-		"live-chat-plugin": "plugin://live-plugin/live-chat-plugin",
-		"live-tabs-plugin": "plugin://live-plugin/live-tabs-plugin"
+		"live-plugin": "plugin://live-plugin/live-plugin"
   }
 }
