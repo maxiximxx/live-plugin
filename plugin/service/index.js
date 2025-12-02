@@ -8,6 +8,14 @@ export const getUserInfoAndValid = async (data) => {
   return res.data
 }
 
+export const userLogin = async (data) => {
+  const res = await baseFetch.post({
+    url: '/live/api/v1/class/login',
+    data,
+  })
+  return res.data
+}
+
 export const joinClass = async (data) => {
   const res = await baseFetch.post({
     url: '/live/api/v1/class/joinClass',
@@ -35,6 +43,31 @@ export const getClass = async (data) => {
 export const getLiveRoomDetail = async (id) => {
   const res = await baseFetch.get({
     url: `/live/api/liveRooms/${id}`,
+  })
+  return res.data
+}
+
+export const getToken = async (data) => {
+  const res = await baseFetch.post({
+    url: '/live/api/v2/class/token',
+    data,
+  })
+  return res.data
+}
+
+export const sendMessage = async (data) => {
+  const res = await baseFetch.post({
+    url: '/live/api/liveRoom/comments',
+    data,
+    isShowLoading: false
+  })
+  return res.data
+}
+
+export const getAttachments = async (data) => {
+  const res = await baseFetch.post({
+    url: '/live/api/v1/class/queryDoc',
+    data
   })
   return res.data
 }

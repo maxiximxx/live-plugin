@@ -16,6 +16,6 @@
 	flex: 1;
 }
 
-.tab0 {
+.tab {
 	height: 100%;
 }

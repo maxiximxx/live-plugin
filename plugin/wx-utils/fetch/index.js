@@ -13,7 +13,7 @@ const getRequestConfig = () => ({
   timeout: 10000,
   isDebounce: true,
   isShowErrorHint: true,
-  isShowLoading: false,
+  isShowLoading: true,
   loadingText: '加载中',
   passStatusCodes: [],
 });

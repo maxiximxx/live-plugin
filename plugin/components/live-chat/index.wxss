@@ -1,19 +1,17 @@
 .wrapper {
   height: 100%;
   display: flex;
-	flex-direction: column;
-	box-sizing: border-box;
+  flex-direction: column;
 }
 
 /* 消息列表 */
 .message-list {
-  flex: 1;
-  padding: 42rpx 56rpx;
-  box-sizing: border-box;
+  height: calc(100% - 180rpx);
+  padding-top: 42rpx;
 }
 
 .message-item {
-  margin-bottom: 56rpx;
+  padding: 0 56rpx 56rpx;
   animation: fadeIn 0.3s ease-in;
   display: flex;
   gap: 10rpx;
@@ -42,17 +40,17 @@
 
 .user-name {
   font-size: 24rpx;
-	color: #666666;
+  color: #666666;
 }
 
 .user-own {
   color: #127ff2;
   border-radius: 4rpx;
-	border: 2rpx solid #127ff2;
-	margin-left: 6rpx;
-	padding: 0 12rpx;
-	font-size: 24rpx;
-	text-align: center;
+  border: 2rpx solid #127ff2;
+  margin-left: 6rpx;
+  padding: 0 12rpx;
+  font-size: 24rpx;
+  text-align: center;
 }
 
 .message-content {

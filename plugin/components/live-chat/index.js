@@ -1,14 +1,16 @@
 // plugin/components/live-chat/index.js
 import * as alivc from '../../lib/alivc-im'
+import { getToken, sendMessage } from '../../service/index'
+import { getUUID } from '../../utils/common'
 import { showToast } from '../../utils/interactive'
 
 const { ImEngine, ImLogLevel } = alivc
 
 // IM SDK 初始化配置
 const imConfig = {
-  deviceId: '1', // 选填
-  appId: '2', // 必须：从阿里云控制台获取
-  appSign:'3', // 必须：从阿里云控制台获取
+  deviceId: getUUID(), // 选填
+  appId: '', // 必须：从阿里云控制台获取
+  appSign: '', // 必须：从阿里云控制台获取
   logLevel: ImLogLevel.ERROR, // 日志输出等级
   wasmPath: '/lib/alivc-im.wasm.br', // wasm文件路径
 }
@@ -16,8 +18,23 @@ const imConfig = {
 Component({
   /*  */
   properties: {
-    // 必须配置项：群组ID（直播间ID）
+    // 必须配置项：群组ID
     groupId: {
+      type: String,
+      value: '',
+    },
+    // 必须配置项：教室ID
+    classId: {
+      type: String,
+      value: '',
+    },
+    // 必须配置项：直播间ID
+    liveRoomId: {
+      type: String,
+      value: '',
+    },
+    // 必须配置项：用户身份
+    identity: {
       type: String,
       value: '',
     },
@@ -25,11 +42,6 @@ Component({
     userInfo: {
       type: Object,
       value: null,
-      observer: function (newVal) {
-        if (newVal && newVal.userId) {
-          this.setData({ currentUser: newVal })
-        }
-      },
     },
     // 可选：最大消息数量
     maxMessages: {
@@ -46,13 +58,6 @@ Component({
     messageList: [], // 消息列表
     inputValue: '', // 输入框内容
     scrollTop: 0, // 消息容器纵向滚动
-
-    // 当前用户
-    currentUser: {
-      userId: '',
-      nickName: '用户',
-      avatar: '',
-    },
   },
 
   lifetimes: {
@@ -60,8 +65,11 @@ Component({
       wx.onAppShow = () => {}
       wx.onAppHide = () => {}
     },
-    attached: function () {
-      this.initializeIM()
+    attached: async function () {
+      if (this.properties.groupId && this.properties.userInfo.user_id) {
+        await this.getToken()
+        this.initializeIM()
+      }
     },
     detached: function () {
       this.cleanup()
@@ -69,6 +77,24 @@ Component({
   },
 
   methods: {
+    // 获取IMConfig
+    getToken: async function () {
+      const res = await getToken({
+        user_id: this.properties.userInfo.user_id,
+        device_type: 'web',
+        device_id: getUUID(), // 这个是uuid
+        im_server: ['aliyun_new'],
+      })
+      if (res && res.aliyun_new_im) {
+        const { app_id, app_sign, app_token, auth } = res.aliyun_new_im || {}
+        imConfig.appId = app_id
+        imConfig.appSign = app_sign
+        this.authInfo = {
+          ...auth,
+          token: app_token,
+        }
+      }
+    },
     // 获取IM引擎实例
     getIMEngine: function () {
       try {
@@ -95,10 +121,11 @@ Component({
 
       try {
         // 调用SDK的init方法进行初始化
+        const { deviceId, appId, appSign } = imConfig
         await imEngine.init({
-          deviceId: imConfig.deviceId,
-          appId: imConfig.appId,
-          appSign: imConfig.appSign,
+          deviceId,
+          appId,
+          appSign,
           locateFile: (url) => {
             if (url.endsWith('.wasm')) {
               return imConfig.wasmPath
@@ -110,6 +137,7 @@ Component({
         this.setData({
           isInitialized: true,
         })
+        // 获取IM实例
         this.imEngine = imEngine
         // 获取群组管理器
         this.groupManager = await imEngine.getGroupManager()
@@ -117,6 +145,8 @@ Component({
         this.messageManager = await imEngine.getMessageManager()
         // 设置事件监听器
         this.setupImEngineListeners()
+        // 登录
+        this.login()
       } catch (error) {
         console.error('IM SDK初始化失败:', error)
       }
@@ -124,10 +154,6 @@ Component({
 
     // 设置imEngine监听
     setupImEngineListeners: function () {
-			// 连接中
-			this.imEngine.on("connecting", () => {
-				console.log("connecting");
-			});
 
       // 连接成功事件
       this.imEngine.on('connectsuccess', () => {
@@ -159,20 +185,11 @@ Component({
 
       // 有人进入或离开群组
       this.groupManager.on('memberdatachange', (data) => {
-        const {
-          groupId,
-          onlineCount,
-          pv,
-          isBigGroup,
-          joinUsers,
-          leaveUsers,
-        } = data
+        const { groupId, onlineCount, pv, isBigGroup, joinUsers, leaveUsers } = data
         console.log(
           `group ${groupId} member change, onlineCount: ${onlineCount}, pv: ${pv}, joinUsers: ${joinUsers
             .map((u) => u.userId)
-            .join(',')}, leaveUsers: ${leaveUsers
-            .map((u) => u.userId)
-            .join('')}`
+            .join(',')}, leaveUsers: ${leaveUsers.map((u) => u.userId).join('')}`,
         )
       })
       console.log('groupManager监听设置完成')
@@ -180,7 +197,7 @@ Component({
       // 收到群聊消息
       this.messageManager.on('recvgroupmessage', (msg, groupId) => {
         console.log('收到群聊消息', msg, groupId)
-        this.handleIncomingMessage({ msg, groupId })
+        this.handleIncomingMessage(msg)
       })
       console.log('messageManager监听设置完成')
     },
@@ -205,38 +222,36 @@ Component({
     },
 
     // 登录IM系统
-    login: async function (authInfo) {
+    login: async function () {
       if (!this.data.isInitialized) {
         console.error('IM系统未初始化')
         return
       }
-
       try {
-        if (!authInfo || !authInfo.token) {
-          console.error('认证信息不完整，缺少token')
+        const authInfo = this.authInfo
+        if (!authInfo) {
+          console.error('没有认证信息')
           return
         }
 
-        const { currentUser } = this.data
-
-        if (!currentUser.userId) {
+        const { userInfo } = this.properties
+        if (!userInfo.user_id) {
           console.error('用户信息不完整，缺少userId')
           return
         }
-
         await this.imEngine.login({
           user: {
-            userId: currentUser.userId,
+            userId: userInfo.user_id,
             userExtension: JSON.stringify({
-              avatar: currentUser.avatar || '',
-              nickName: currentUser.nickName || '用户',
+              avatar: userInfo.avatar,
+              nickName: userInfo.user_name,
             }),
           },
           userAuth: {
             timestamp: authInfo.timestamp,
             nonce: authInfo.nonce,
             token: authInfo.token,
-            role: authInfo.role || 'user',
+            role: authInfo.role,
           },
         })
 
@@ -251,19 +266,19 @@ Component({
 
     // 进入群组
     enterGroup: async function () {
-      const targetGroupId = this.properties.groupId
-      if (!targetGroupId) {
+      const groupId = this.properties.groupId
+      if (!groupId) {
         console.error('群组ID不能为空')
         return
       }
       try {
-        await this.groupManager.joinGroup(targetGroupId)
-        console.log(`进入群组成功: ${targetGroupId}`)
-        this.triggerEvent('entergroupsuccess', { groupId: targetGroupId })
+        await this.groupManager.joinGroup(groupId)
+        console.log(`进入群组成功: ${groupId}`)
+        this.triggerEvent('entergroupsuccess', { groupId })
       } catch (error) {
         console.error('进入群组失败:', error)
         this.triggerEvent('entergroupfailed', {
-          groupId: targetGroupId,
+          groupId,
           error: error,
         })
       }
@@ -273,20 +288,23 @@ Component({
     onSendMessage: async function () {
       const content = (this.data.inputValue || '').trim()
       if (!content) {
-        showToast('输入内容为空， 请重新输入')
+        showToast('输入内容为空，请重新输入')
         return
       }
-
-      if (!this.properties.groupId) {
-        console.error('未设置直播间ID')
-        return
-      }
-
       try {
-        await this.essageManager.sendGroupMessage({
+        // 发送聊天消息（到IM）
+        this.messageManager.sendGroupMessage({
           groupId: this.properties.groupId,
           data: JSON.stringify({ content }),
           type: 88888,
+        })
+        // 发送聊天消息（到后端）
+        sendMessage({
+          content,
+          identity: this.properties.identity,
+          liveRoomId: this.properties.liveRoomId,
+          userId: this.properties.userInfo.user_id,
+          name: this.properties.userInfo.user_name,
         })
       } catch (error) {
         console.error('发送消息失败:', error)
@@ -304,39 +322,33 @@ Component({
           // 判断当前消息列表是否超过最大限制  保留最新的消息
           messageList: messageList.slice(-maxMessages),
         },
-        this.scrollToBottom
+        this.scrollToBottom,
       )
     },
 
     // 自动滚动到底部
     scrollToBottom: function () {
       this.setData({
-        scrollTop: 999999,
+        scrollTop: 999999, // 设置一个非常大的值
       })
     },
 
     // 格式化消息
-    formatMessage: function (rawMessage) {
+    formatMessage: function (data) {
       let userExt = {}
-      userExt = rawMessage.senderUserExtension
-        ? JSON.parse(rawMessage.senderUserExtension)
-        : {}
+      userExt = data.sender.userExtension ? JSON.parse(data.sender.userExtension) : {}
 
-      const messageType = rawMessage.type || 'text'
-      const content = this.parseMessageContent(rawMessage)
-      const isOwn = rawMessage.senderId === this.data.currentUser.userId
+      const content = this.parseMessageContent(data)
+      const isOwn = data.sender.userId === this.properties.userInfo.user_id
 
       return {
-        messageId:
-          rawMessage.messageId ||
-          `msg_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
-        messageType: messageType,
-        content: content,
-        nickName: userExt.nickName || rawMessage.senderId || '未知用户',
-        avatar: userExt.avatar || '',
-        isOwn: isOwn,
-        rawData: rawMessage,
-        timestamp: rawMessage.timestamp || Date.now(),
+        messageId: data.messageId,
+        messageType: data.type,
+        content,
+        nickName: userExt.nickName || '未知用户',
+        avatar: userExt.avatar,
+        isOwn,
+        timestamp: data.timestamp || Date.now(),
       }
     },
 
