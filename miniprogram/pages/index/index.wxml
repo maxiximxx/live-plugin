@@ -1,2 +1,2 @@
-
-<live-plugin />
+<!-- 直播插件使用 -->
+<live-plugin classId="{{classId}}" liveRoomId="{{liveRoomId}}" identity="{{identity}}" account="{{account}}" token="{{token}}" planId="{{planId}}" />

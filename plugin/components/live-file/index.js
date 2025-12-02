@@ -7,8 +7,8 @@ Component({
    * 组件的属性列表
    */
   properties: {
-    // 必须配置项：教室ID
-    classId: {
+    // 必须配置项：直播间ID
+    liveRoomId: {
       type: String,
       value: '',
     },
@@ -34,24 +34,21 @@ Component({
     // 获取直播文档
     getAttachments: async function () {
       const res = await getAttachments({
-        classId: this.properties.classId,
+        liveRoomId: this.properties.liveRoomId,
       })
-      if (res && Array.isArray(res.docInfos)) {
-        const fileList = res.docInfos.map((item) => {
-          const fileInfo = item.docInfos ? JSON.parse(item.docInfos) : {}
-          const { name: fileName, fileType, docId: fileId, params } = fileInfo
+      if (Array.isArray(res)) {
+        const fileList = res.map((item) => {
+          const { name, fileType, fileUrl, createTime } = item
           return {
-            fileId,
-            fileName,
+            fileName: name,
             fileType,
-            fileTime: item.createdAt,
-            fileUrl: params.backupResultUrls[0],
+            fileTime: createTime,
+            fileUrl,
           }
         })
         this.setData({
           fileList,
         })
-        console.log(fileList)
       }
     },
     onOpenFile: async function (e) {

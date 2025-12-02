@@ -1,0 +1,6 @@
+var isLoadTab = function (loadIndexes, index) {
+  return loadIndexes.indexOf(index) !== -1
+}
+module.exports = {
+  isLoadTab: isLoadTab,
+}

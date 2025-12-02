@@ -1,29 +1,22 @@
 <!--plugin/components/live-plugin/index.wxml-->
-<wxs module="tools">
-  var isLoadTab = function (loadIndexes, index) {
-    return loadIndexes.indexOf(index) !== -1;
-   }
-  module.exports = {
-    isLoadTab: isLoadTab
-  }
-</wxs>
-
+<wxs module="tools" src="./tools.wxs" />
 <view class="wrapper">
-  <view class="live-player">
-    <live-player-plugin src="{{liveSrc}}" mode="live" autoplay="{{true}}" bindstatechange="onStateChange" binderror="onPlayerError" />
-  </view>
-
-  <view class="live-tabs">
-    <live-tabs-plugin tabs="{{tabs}}" activeIndex="{{activeIndex}}" bind:tabchange="onTabChange">
-      <view slot="tab-content-0" class="tab">
-        <live-desc-plugin desc="{{liveDesc}}" wx:if="{{tools.isLoadTab(loadIndexes, 0)}}" />
-      </view>
-      <view slot="tab-content-1" class="tab">
-        <live-file-plugin classId="{{classId}}" wx:if="{{tools.isLoadTab(loadIndexes, 1)}}" />
-      </view>
-      <view slot="tab-content-2" class="tab">
-        <live-chat-plugin groupId="{{groupId}}" classId="{{classId}}" liveRoomId="{{liveRoomId}}" identity="{{identity}}" userInfo="{{userInfo}}" wx:if="{{tools.isLoadTab(loadIndexes, 2)}}" />
-      </view>
-    </live-tabs-plugin>
-  </view>
+	<!-- 播放器 -->
+	<view class="live-player">
+		<live-player-plugin src="{{liveSrc}}" isReplay="{{isReplay}}" mode="live" autoplay="{{true}}" bindstatechange="onStateChange" binderror="onPlayerError" />
+	</view>
+	<!-- 操作tab -->
+	<view class="live-tabs">
+		<live-tabs-plugin tabs="{{tabs}}" activeIndex="{{activeIndex}}" bind:tabchange="onTabChange">
+			<view slot="tab-content-0" class="tab">
+				<live-desc-plugin desc="{{liveDesc}}" wx:if="{{tools.isLoadTab(loadIndexes, 0)}}" />
+			</view>
+			<view slot="tab-content-1" class="tab">
+				<live-file-plugin liveRoomId="{{liveRoomId}}" wx:if="{{tools.isLoadTab(loadIndexes, 1)}}" />
+			</view>
+			<view slot="tab-content-2" class="tab">
+				<live-chat-plugin groupId="{{groupId}}" classId="{{classId}}" liveRoomId="{{liveRoomId}}" identity="{{identity}}" userInfo="{{userInfo}}" isReplay="{{isReplay}}" wx:if="{{tools.isLoadTab(loadIndexes, 2)}}" />
+			</view>
+		</live-tabs-plugin>
+	</view>
 </view>

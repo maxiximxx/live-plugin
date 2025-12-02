@@ -41,7 +41,12 @@ Component({
     // 必须配置项：用户信息
     userInfo: {
       type: Object,
-      value: null,
+      value: {},
+    },
+    // 可选：是否回放
+    isReplay: {
+      type: Boolean,
+      value: false,
     },
     // 可选：最大消息数量
     maxMessages: {
@@ -62,8 +67,11 @@ Component({
 
   lifetimes: {
     created: function () {
+      // MOCK以下4个方法  插件不支持但是IM SDK使用了
       wx.onAppShow = () => {}
       wx.onAppHide = () => {}
+      wx.offAppShow = () => {}
+      wx.offAppHide = () => {}
     },
     attached: async function () {
       if (this.properties.groupId && this.properties.userInfo.user_id) {
@@ -154,7 +162,6 @@ Component({
 
     // 设置imEngine监听
     setupImEngineListeners: function () {
-
       // 连接成功事件
       this.imEngine.on('connectsuccess', () => {
         console.log('IM连接成功')
@@ -275,12 +282,26 @@ Component({
         await this.groupManager.joinGroup(groupId)
         console.log(`进入群组成功: ${groupId}`)
         this.triggerEvent('entergroupsuccess', { groupId })
+        // 查询最近群发消息列表
+        this.getLatestMessageList()
       } catch (error) {
         console.error('进入群组失败:', error)
         this.triggerEvent('entergroupfailed', {
           groupId,
           error: error,
         })
+      }
+    },
+
+    // 查询最近群发消息列表
+    getLatestMessageList: async function () {
+      const messagesInfo = await this.messageManager.listRecentMessage({
+        groupId: this.properties.groupId, // 群组ID
+      })
+      const { messageList } = messagesInfo
+      for (const data of messageList) {
+        const message = this.formatMessage(data)
+        this.addMessageToList(message)
       }
     },
 
@@ -339,7 +360,7 @@ Component({
       userExt = data.sender.userExtension ? JSON.parse(data.sender.userExtension) : {}
 
       const content = this.parseMessageContent(data)
-      const isOwn = data.sender.userId === this.properties.userInfo.user_id
+      const isOwn = data.sender.userId === this.properties.userInfo.user_id // 是否是自己发送的消息
 
       return {
         messageId: data.messageId,
@@ -377,7 +398,7 @@ Component({
           }
 
           // 登出后如无需再进行登录，可以进行反初始化操作，SDK会对底层操作实例进行释放。
-          await this.ImEngine.unInit()
+          await this.imEngine?.unInit()
 
           console.log('IM资源清理完成')
         } catch (error) {
@@ -385,8 +406,9 @@ Component({
         }
       }
       // 移除所有监听
-      this.groupManager.removeAllListeners()
-      this.messageManager.removeAllListeners()
+      this.imEngine?.removeAllListeners()
+      this.groupManager?.removeAllListeners()
+      this.messageManager?.removeAllListeners()
     },
   },
 })

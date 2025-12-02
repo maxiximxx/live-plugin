@@ -1,13 +1,8 @@
-<!-- 使用view覆盖在原生组件上，以实现弹幕等UI -->
-<live-player class="live-player" id="livePlayer" src="{{src}}" mode="{{mode}}" autoplay="{{autoplay}}" muted="{{muted}}" orientation="{{orientation}}" object-fit="{{objectFit}}" min-cache="{{minCache}}" max-cache="{{maxCache}}" bindstatechange="onStateChange" binderror="onError" bindfullscreenchange="onFullscreenChange">
-	<view class="control-bar" wx:if="{{showControl}}">
+<video class="live-player" wx:if="{{isReplay}}" src="{{src}}" autoplay="{{autoplay}}" muted="{{muted}}" />
+<live-player wx:else class="live-player" id="livePlayer" src="{{src}}"  autoplay="{{autoplay}}" muted="{{muted}}" orientation="{{orientation}}" object-fit="{{objectFit}}" min-cache="{{minCache}}" max-cache="{{maxCache}}" bindstatechange="onStateChange" binderror="onError" bindfullscreenchange="onFullscreenChange">
+	<!-- <view class="control-bar" wx:if="{{showControl}}">
 		<button class="btn" bindtap="togglePlay">{{playing ? '暂停' : '播放'}}</button>
 		<button class="btn" bindtap="toggleMute">{{muted ? '开启声音' : '静音'}}</button>
 		<button class="btn" bindtap="toggleFullScreen">全屏</button>
-	</view>
-
-	<!-- 这里可以添加更多的view，例如自定义loading、错误提示等 -->
-	<view class="error-toast" wx:if="{{errorMessage}}">
-		{{errorMessage}}
-	</view>
+	</view> -->
 </live-player>

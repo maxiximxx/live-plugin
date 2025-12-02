@@ -1,7 +1,14 @@
+import { showToast } from "../../utils/interactive"
+
 // plugin/components/live-player/live-player.js
 Component({
   properties: {
-    // 阿里云直播流地址
+		// 是否回放
+		isReplay: {
+			type: Boolean,
+			value: false
+		},
+    // 阿里云直播流地址或者回放地址
     src: {
       type: String,
       value: '',
@@ -21,15 +28,10 @@ Component({
       type: String,
       value: 'vertical',
     },
-    // 填充模式：contain, fillCrop
+    // 填充模式：contain(图像长边填满屏幕), fillCrop(图像铺满屏幕), fill(填充), cover(	覆盖)
     objectFit: {
       type: String,
       value: 'contain',
-    },
-    // 播放模式：live（直播）, RTC（实时通话，时延更低）
-    mode: {
-      type: String,
-      value: 'live',
     },
     // 是否显示默认控制条
     showControl: {
@@ -58,7 +60,7 @@ Component({
 
   observers: {
     errorMessage: (errorMessage) => {
-      console.log(errorMessage)
+      showToast(errorMessage)
     },
   },
 
@@ -75,18 +77,9 @@ Component({
       const code = e.detail.code
       console.log('播放状态变化:', code)
 
-      // 根据状态码更新UI
-      const stateMap = {
-        2001: '已连接服务器',
-        2002: '开始拉流',
-        2004: '视频播放开始',
-        2007: '视频播放Loading',
-        '-2301': '网络断连，重连失败',
-      }
-
       if (code === 2004) {
         this.setData({ playing: true, errorMessage: '' })
-      } else if (code === -2301) {
+      } else if (code === -2301 || code === -2302) {
         this.setData({ errorMessage: '网络连接失败，请检查网络' })
       }
 

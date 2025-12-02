@@ -59,15 +59,19 @@ export const sendMessage = async (data) => {
   const res = await baseFetch.post({
     url: '/live/api/liveRoom/comments',
     data,
-    isShowLoading: false
+    isShowLoading: false,
   })
   return res.data
 }
 
 export const getAttachments = async (data) => {
-  const res = await baseFetch.post({
-    url: '/live/api/v1/class/queryDoc',
-    data
+  const res = await baseFetch.get({
+    url: '/live/liveRoom/attachments',
+    data: {
+      pageIndex: 1,
+      pageSize: 100,
+      ...data,
+    },
   })
   return res.data
 }

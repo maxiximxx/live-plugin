@@ -1,24 +1,24 @@
 <view class="wrapper">
-  <!-- 消息列表 -->
-  <scroll-view class="message-list" scroll-y scroll-top="{{scrollTop}}" scroll-with-animation enable-passive>
-    <!-- 消息项 -->
-    <view wx:for="{{messageList}}" wx:key="messageId" class="message-item">
-      <image class="user-avatar" src="{{item.avatar || '/assets/default-avatar.webp'}}" mode="aspectFit" />
-      <view class="right">
-        <view class="user">
-          <text class="user-name">{{item.nickName}}</text>
-          <text class="user-own">我</text>
-        </view>
-        <view class="message-content">{{item.content}}</view>
-      </view>
-    </view>
-  </scroll-view>
+	<!-- 消息列表 -->
+	<scroll-view style="height: calc(100% - {{isReplay ? 0: 180}}rpx);" class="message-list" scroll-y scroll-top="{{scrollTop}}" scroll-with-animation enable-passive>
+		<!-- 消息项 -->
+		<view wx:for="{{messageList}}" wx:key="messageId" class="message-item">
+			<!-- <image class="user-avatar" src="{{item.avatar || '/assets/default-avatar.webp'}}" mode="aspectFit" /> -->
+			<view class="right">
+				<view class="user">
+					<text class="user-name">{{item.nickName}}</text>
+					<text class="user-own" wx:if="{{item.isOwn}}">我</text>
+				</view>
+				<view class="message-content">{{item.content}}</view>
+			</view>
+		</view>
+	</scroll-view>
 
-  <!-- 输入区域 -->
-  <view class="input-area">
-    <input class="message-input" model:value="{{inputValue}}" placeholder="说点什么..." bindconfirm="onSendMessage" disabled="{{!isLoggedIn}}" />
-    <button class="send-button" bindtap="onSendMessage">
-      发送
-    </button>
-  </view>
+	<!-- 输入区域 -->
+	<view class="input-area" wx:if="{{!isReplay}}">
+		<input class="message-input" model:value="{{inputValue}}" placeholder="说点什么..." bindconfirm="onSendMessage" disabled="{{!isLoggedIn}}" />
+		<button class="send-button" bindtap="onSendMessage">
+			发送
+		</button>
+	</view>
 </view>

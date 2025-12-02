@@ -6,7 +6,6 @@
 
 /* 消息列表 */
 .message-list {
-  height: calc(100% - 180rpx);
   padding-top: 42rpx;
 }
 
