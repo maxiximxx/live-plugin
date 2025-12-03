@@ -75,3 +75,10 @@ export const getAttachments = async (data) => {
   })
   return res.data
 }
+
+export const getRepayDetail = async (roomId) => {
+  const res = await baseFetch.get({
+    url: `/live/api/liveRoom/replays/${roomId}/list`,
+  })
+  return res.data
+}

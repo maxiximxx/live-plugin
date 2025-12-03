@@ -4,9 +4,9 @@ Page({
     classId: '77f413bf52034b8d9dd7d924ca5cdac1', // 教室id
     liveRoomId: '1995453337989939201', // 直播间id
     identity: '1', // 用户身份 1(学生) 2(助教) 3(讲师)
-    account: '', // 用户账号
-    token: '', //用户token
-    planId: '', // 计划ID 回放功能判断
+    account: 'test', // 用户账号
+    token: 'test', //用户token
+    planId: 'test', // 计划ID 回放功能判断
   },
 
   onLoad() {

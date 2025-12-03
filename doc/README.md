@@ -1,7 +1,7 @@
 # 小程序直播插件
 ## ✅ 使用方式
 
-在页面的 WXML 文件中直接使用 `<live-plugin>` 组件，并传入以下属性：
+在页面的 WXML 文件中直接使用 `<live-plugin />` 组件，并传入以下属性：
 
 ```html
 <live-plugin

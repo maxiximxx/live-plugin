@@ -152,7 +152,7 @@ Component({
         // 获取消息管理器
         this.messageManager = await imEngine.getMessageManager()
         // 设置事件监听器
-        this.setupImEngineListeners()
+        this.setupListeners()
         // 登录
         this.login()
       } catch (error) {
@@ -160,8 +160,8 @@ Component({
       }
     },
 
-    // 设置imEngine监听
-    setupImEngineListeners: function () {
+    // 设置事件监听器
+    setupListeners: function () {
       // 连接成功事件
       this.imEngine.on('connectsuccess', () => {
         console.log('IM连接成功')

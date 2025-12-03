@@ -1,6 +1,7 @@
 import {
   getClass,
   getLiveRoomDetail,
+  getRepayDetail,
   getSdkParam,
   getUserInfoAndValid,
   joinClass,
@@ -59,27 +60,18 @@ Component({
     loadIndexes: [0], // 加载过的tab索引
   },
 
-  observers: {
-    isReplay: function (newVal) {
-      // 如果是回放  则获取回放连接
-      if (newVal) {
-        this.getRepayDetail()
-      }
-    },
-  },
-
   lifetimes: {
     attached: function () {
-			const token = wx.getStorageSync('ACCOUNT_TOKEN')
-			const apiHost = wx.getStorageSync('API_HOST') 
+      const token = wx.getStorageSync('ACCOUNT_TOKEN')
+      const apiHost = wx.getStorageSync('API_HOST')
       // 检查Token是否存在
       if (!token) {
         throw new Error('插件API调用失败：未找到AccountToken。请确保在使用插件前调用setAccountToken方法。')
-			}
-			// 检查apiHost是否存在
-			if (!apiHost) {
+      }
+      // 检查apiHost是否存在
+      if (!apiHost) {
         throw new Error('插件API调用失败：未找到APIHOST。请确保在使用插件前调用setApiHost方法。')
-			}
+      }
       this.init()
     },
   },
@@ -92,8 +84,6 @@ Component({
     init: async function () {
       await this.getUserInfo()
       await this.userLogin()
-      this.joinClass()
-      this.getClass()
       this.getLiveRoomDetail()
       // this.getSdkParam()
     },
@@ -123,6 +113,26 @@ Component({
       })
     },
 
+    // 获取直播间详情
+    getLiveRoomDetail: async function () {
+      const res = await getLiveRoomDetail(this.properties.liveRoomId)
+      if (res) {
+        const isReplay = res.status == 2 && !!this.properties.planId // 是否回放
+        this.setData({
+          liveDesc: res.liveIntroduce || '',
+          isReplay,
+        })
+        if (isReplay) {
+          // 如果是回放  则获取回放连接
+          this.getRepayDetail()
+        } else {
+          // 否则获取直播链接
+          this.joinClass()
+          this.getClass()
+        }
+      }
+    },
+
     // 加入直播间
     joinClass: async function () {
       if (this.userInfo) {
@@ -142,7 +152,9 @@ Component({
         id: this.properties.classId,
         user_id: this.userInfo.user_id,
       })
-      const liveSrc = res?.link_info?.cdn_pull_info?.rtmp_url
+      const srcList = res?.link_info?.cdn_pull_info
+      // 微信live-player仅支持rtmp、flv格式
+      const liveSrc = srcList?.rtmp_url || srcList?.flv_url
       const groupId = res?.aliyun_id
       if (groupId && liveSrc) {
         this.setData({
@@ -153,19 +165,15 @@ Component({
       return res
     },
 
-    // 获取直播间详情
-    getLiveRoomDetail: async function () {
-      const res = await getLiveRoomDetail(this.properties.liveRoomId)
-      if (res) {
+    // 获取回放连接
+    getRepayDetail: async function () {
+      const res = await getRepayDetail(this.properties.liveRoomId)
+      if (Array.isArray(res)) {
         this.setData({
-          liveDesc: res.liveIntroduce || '',
-          isReplay: res.status == 2 && this.properties.planId,
+          liveSrc: res[0]?.videoUrl,
         })
       }
     },
-
-    // 获取回放连接
-    getRepayDetail: async function () {},
 
     // 获取sdk接入参数
     getSdkParam: async function () {
@@ -173,9 +181,7 @@ Component({
         liveRoomId: this.properties.liveRoomId,
       })
       if (res?.sdkUrl) {
-        this.setData({
-          src: res.sdkUrl,
-        })
+        // 不知道干嘛
       }
     },
 
