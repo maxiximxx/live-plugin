@@ -195,20 +195,14 @@ Component({
       })
     },
 
+    // 播放器状态监听
     onStateChange(e) {
       console.log('播放状态:', e.detail)
     },
 
+    // 播放器错误监听
     onPlayerError(e) {
       console.error('播放器错误:', e.detail)
-      wx.showToast({
-        title: '播放出错',
-        icon: 'none',
-      })
-    },
-
-    onTokenExpired: function (e) {
-      console.log('onTokenExpired', e.detail)
     },
   },
 })
